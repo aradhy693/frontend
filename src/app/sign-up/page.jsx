@@ -1,4 +1,5 @@
 'use client';
+import { IconCircleCheck, IconLoader } from '@tabler/icons-react';
 import { useFormik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
@@ -9,6 +10,14 @@ const SignupSchema = Yup.object().shape({
     .max(50, 'Too Long!')
     .required('Required'),
   email: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string().required('password is required')
+    .matches(/[a-z]/, 'Lowercase letter Required')
+    .matches(/[A-Z]/, 'Uppercase letter Required')
+    .matches(/[0-9]/, 'number Required')
+    .matches(/\W/, 'special character Required'),
+  confirmPassword: Yup.string().required('requied')
+    .oneOf([Yup.ref('password'), null], 'password must match')
+
 });
 
 const Signup = () => {
@@ -20,8 +29,11 @@ const Signup = () => {
       password: '',
       confirmPassword: ''
     },
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: (values, { resetForm, setSubmitting }) => {
+      setTimeout(() => {
+        console.log(values);
+        resetForm();
+      }, 3000)
     },
     validationSchema: SignupSchema
   });
@@ -62,9 +74,12 @@ const Signup = () => {
                 ((signupForm.touched.confirmPassword && signupForm.errors.confirmPassword) ? 'border-red-500' : '')}
             />
 
-            <button type='submit'
-              className='bg-blue-500 text-white px-3 py-2 rounded w-full mt-8'
-            >Submit</button>
+            <button type='submit' disabled={signupForm.isSubmitting}
+              className=' flex justify-center item-center bg-blue-500 text-white px-3 py-2 rounded w-full mt-8 disabled:opacity-50'
+            >
+              {signupForm.isSubmitting ? <IconLoader className='animate-spin' size={20} /> : <IconCircleCheck />}
+              <span>{signupForm.isSubmitting ? 'please wait' : 'submit'}</span>
+            </button>
 
 
           </form>
